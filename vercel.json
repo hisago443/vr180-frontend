@@ -1,4 +1,4 @@
-{
+﻿{
   "version": 2,
   "builds": [
     { "src": "dist/spa/**", "use": "@vercel/static" },
@@ -6,6 +6,8 @@
   ],
   "routes": [
     { "src": "/server/(.*)", "dest": "/dist/server/$1" },
+    { "src": "/assets/(.*)", "dest": "/dist/spa/assets/$1" },
+    { "src": "/favicon.ico", "dest": "/dist/spa/favicon.ico" },
     { "src": "/(.*)", "dest": "/dist/spa/index.html" }
   ]
 }
