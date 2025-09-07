@@ -1,0 +1,145 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello world project</title>
+  </head>
+
+  <body><input type='file' id='video-upload-input' accept='video/*' />
+<button id='convert-btn'>Convert to VR 180°</button>
+<div style='width: 100%; background: #f0f0f0; height: 24px; border-radius: 4px; margin: 10px 0;'>
+  <div id='progress-bar' style='width: 0%; height: 24px; background: #4CAF50; text-align: center; line-height: 24px; color: white;'>0%</div>
+</div>
+<div id='status-text' style='font-style: italic;'>Waiting for upload...</div>
+<button id='download-btn' style='display: none;'>Download VR Video</button>
+    <div id="root"></div>
+
+    <script type="module" src="/client/App.tsx"></script>
+  <!-- VR 180 Converter UI -->
+<div id='vr180-container' style='max-width:600px;margin:40px auto;padding:20px;border:1px solid #ddd;border-radius:8px;'>
+  <h2>🥽 VR 180° Video Converter</h2>
+  <input type='file' id='video-upload-input' accept='video/*' style='display:block;margin:20px 0;' />
+  <button id='convert-btn' style='padding:12px 24px;background:#4CAF50;color:#fff;border:none;border-radius:4px;font-size:16px;cursor:pointer;'>
+    🚀 Convert to VR 180°
+  </button>
+  <div style='margin:20px 0;background:#f0f0f0;border-radius:4px;overflow:hidden;'>
+    <div id='progress-bar' style='width:0;height:24px;background:#4CAF50;text-align:center;color:#fff;line-height:24px;'>0%</div>
+  </div>
+  <div id='status-text' style='font-style:italic;'>Waiting for upload…</div>
+  <button id='download-btn' style='display:none;margin-top:20px;padding:12px 24px;background:#2196F3;color:#fff;border:none;border-radius:4px;cursor:pointer;'>
+    ⬇️ Download VR Video
+  </button>
+</div>
+<script>
+  const API_BASE_URL = 'https://vr180-backend-792184573548.asia-south1.run.app';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const uploadInput = document.getElementById('video-upload-input');
+    const convertBtn = document.getElementById('convert-btn');
+    const progressBar = document.getElementById('progress-bar');
+    const statusText = document.getElementById('status-text');
+    const downloadBtn = document.getElementById('download-btn');
+
+    convertBtn.onclick = async () => {
+      if (!uploadInput.files.length) {
+        alert('Please select a video file.');
+        return;
+      }
+      convertBtn.textContent = 'Uploading…';
+      convertBtn.disabled = true;
+
+      const form = new FormData();
+      form.append('file', uploadInput.files[0]);
+
+      const upRes = await fetch(${API_BASE_URL}/api/upload, { method: 'POST', body: form });
+      if (!upRes.ok) {
+        alert('Upload failed');
+        convertBtn.textContent = '🚀 Convert to VR 180°';
+        convertBtn.disabled = false;
+        return;
+      }
+
+      const { video_id } = await upRes.json();
+      localStorage.setItem('vr180_last_id', video_id);
+
+      convertBtn.textContent = 'Converting…';
+      await fetch(${API_BASE_URL}/api/convert/, { method: 'POST' });
+
+      while (true) {
+        const statusRes = await fetch(${API_BASE_URL}/api/conversion-status/);
+        const { progress, message } = await statusRes.json();
+
+        progressBar.style.width = progress + '%';
+        progressBar.textContent = progress + '%';
+        statusText.textContent = message;
+
+        if (progress >= 100) break;
+        await new Promise(r => setTimeout(r, 1000));
+      }
+
+      downloadBtn.style.display = 'block';
+      downloadBtn.onclick = () => window.open(${API_BASE_URL}/api/videos//download, '_blank');
+
+      convertBtn.textContent = '✅ Done';
+      convertBtn.disabled = false;
+    };
+  });
+</script><script>
+const API_BASE_URL = 'https://vr180-backend-792184573548.asia-south1.run.app';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const uploadInput = document.getElementById('video-upload-input');
+  const convertBtn = document.getElementById('convert-btn');
+  const progressBar = document.getElementById('progress-bar');
+  const statusText = document.getElementById('status-text');
+  const downloadBtn = document.getElementById('download-btn');
+
+  convertBtn.onclick = async () => {
+    if (!uploadInput.files.length) {
+      alert('Please select a video file.');
+      return;
+    }
+    convertBtn.textContent = 'Uploading…';
+    convertBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('file', uploadInput.files[0]);
+
+    try {
+      const uploadRes = await fetch(\\/api/upload\, { method: 'POST', body: formData });
+      if (!uploadRes.ok) throw new Error('Upload failed');
+
+      const { video_id } = await uploadRes.json();
+
+      convertBtn.textContent = 'Converting…';
+      await fetch(\\/api/convert/\\, { method: 'POST' });
+
+      while (true) {
+        const statusRes = await fetch(\\/api/conversion-status/\\);
+        const { progress, message } = await statusRes.json();
+
+        progressBar.style.width = progress + '%';
+        progressBar.textContent = progress + '%';
+        statusText.textContent = message;
+
+        if (progress >= 100) break;
+        await new Promise(r => setTimeout(r, 1000));
+      }
+
+      downloadBtn.style.display = 'block';
+      downloadBtn.onclick = () => window.open(\\/api/videos/\/download\, '_blank');
+
+      convertBtn.textContent = '✅ Done';
+      convertBtn.disabled = false;
+    } catch (error) {
+      alert(error.message);
+      convertBtn.textContent = '🚀 Convert to VR 180°';
+      convertBtn.disabled = false;
+    }
+  };
+});
+</script></body>
+</html>
+
+
