@@ -9,3 +9,4 @@
     { "src": "/(.*)", "dest": "/dist/spa/index.html" }
   ]
 }
+
